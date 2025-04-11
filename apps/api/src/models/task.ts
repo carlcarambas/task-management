@@ -11,9 +11,7 @@ export interface ITask extends Document {
 }
 
 // Task model interface
-interface ITaskModel extends Model<ITask> {
-  // You can add static methods here if needed
-}
+interface ITaskModel extends Model<ITask> {}
 
 const taskSchema = new Schema<ITask, ITaskModel>(
   {
@@ -60,5 +58,4 @@ taskSchema.index({ createdAt: -1 });
 // };
 
 const Task = mongoose.model<ITask, ITaskModel>('Task', taskSchema);
-
-export { Task };
+export default Task;

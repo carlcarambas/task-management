@@ -43,6 +43,14 @@ router.post('/login', async (req, res) => {
     const user: IUser = await User.findByCredentials(email, password);
     const token: string = await user.generateAuthToken();
 
+    // secure set to false to allow cross-site access for testing purposes
+    // res.cookie('token', token, { maxAge: 60 * 60 * 24 * 30, httpOnly: false });
+    res.cookie('token', token, {
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false /* true */,
+    });
     res.send({ user, token });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -56,34 +64,22 @@ router.post('/login', async (req, res) => {
 // User logout (current session)
 router.post('/logout', auth, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(
-      (token: { token: string }) => token.token !== req.token
-    );
-    await req.user.save();
+    const token = req.cookies.token;
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    const user = await User.findOne({ 'tokens.token': token });
+    if (user) {
+      user.tokens = user.tokens.filter((t) => t.token !== token);
+      await user.save();
+    }
 
     res.send({ message: 'Logged out successfully' });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(500).send({ error: error.message });
-    } else {
-      res.status(500).send({ error: 'An unknown error occurred' });
-    }
-  }
-});
-
-// User logout (all sessions)
-router.post('/logoutAll', auth, async (req, res) => {
-  try {
-    req.user.tokens = [];
-    await req.user.save();
-
-    res.send({ message: 'Logged out from all sessions successfully' });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(500).send({ error: error.message });
-    } else {
-      res.status(500).send({ error: 'An unknown error occurred' });
-    }
+  } catch (error) {
+    res.status(500).send({ error: 'Logout failed' });
   }
 });
 

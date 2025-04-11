@@ -8,7 +8,7 @@ interface DecodedToken extends JwtPayload {
 
 const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies.token;
     if (!token) throw new Error();
 
     const decoded = jwt.verify(
