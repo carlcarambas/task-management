@@ -12,12 +12,10 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      # Optional: add initialization script if needed
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - nx-network
 
-  # Nx development service (contains both API and client)
   nx-dev:
     build:
       context: .
@@ -29,7 +27,6 @@ services:
     ports:
       # API port
       - "3333:3333" 
-      # Client port (Angular/React)
       - "4200:4200"
     environment:
       - NODE_ENV=development
