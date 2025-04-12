@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   # MongoDB service
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    restart: always
+    restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=example
@@ -14,50 +12,39 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      # Optional: add initialization script if needed
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
-      - app-network
+      - nx-network
 
-  # Backend Express API service
-  backend:
+  # Nx development service (contains both API and client)
+  nx-dev:
     build:
       context: .
-      dockerfile: ./apps/api/Dockerfile
-    container_name: backend
-    restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - MONGODB_URI=mongodb://task_user:task_password@mongodb:27017/task-manager
-      - JWT_SECRET=your_secret_key_here
+      dockerfile: Dockerfile
+    container_name: nx-workspace
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
     ports:
-      - "3000:3000"
+      # API port
+      - "3333:3333" 
+      # Client port (Angular/React)
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/task-manager?authSource=admin
+    command: npm run start-all
     depends_on:
       - mongodb
     networks:
-      - app-network
-
-  # Frontend React application
-  frontend:
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    container_name: frontend
-    restart: always
-    environment:
-      - NODE_ENV=production
-      - REACT_APP_API_URL=http://localhost:3000/api
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
-    networks:
-      - app-network
+      - nx-network
 
 networks:
-  app-network:
+  nx-network:
     driver: bridge
 
 volumes:
   mongodb_data:
     driver: local
+  node_modules:

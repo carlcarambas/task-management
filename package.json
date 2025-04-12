@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "npx nx run-many --target=serve --projects=api,client --parallel"
+    "start": "npx nx run-many --target=serve --projects=api,client --parallel",
+    "start-all": "nx run-many --target=serve --projects=api,client --parallel",
+    "build:client": "nx build client",
+    "build:api": "nx build api",
+    "serve:client": "nx serve client",
+    "serve:api": "nx serve api"
   },
   "private": true,
   "devDependencies": {
@@ -24,6 +29,9 @@
     "@swc/cli": "~0.6.0",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "@prisma/client": "^6.6.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/mongoose": "^5.11.97",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.1.0",
     "@types/cookie-parser": "^1.4.8",
@@ -80,6 +88,12 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "^7.5.0",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "unless": "^0.1.1"
   }
 }
