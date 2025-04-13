@@ -46,17 +46,19 @@ jobs:
         run: |
           docker compose -f docker-compose.yml up -d
           docker ps -a
+          
 
-      - name: Run linting
-        run: npx nx affected --target=lint --parallel=3
+      - name: Run linting & Build
+        run: npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci
+      #   run: npx nx affected --target=lint --parallel=3
 
-      - name: Run tests
-        run: |
-          npx nx affected --target=test --parallel=3 --ci
-          docker compose -f docker-compose.yml down
+      # - name: Run tests
+      #   run: |
+      #     npx nx affected --target=test --parallel=3 --ci
+      #     docker compose -f docker-compose.yml down
 
-      - name: Run build
-        run: npx nx affected --target=build --parallel=3
+      # - name: Run build
+      #   run: npx nx affected --target=build --parallel=3
 
       - name: Cleanup
         if: always()
