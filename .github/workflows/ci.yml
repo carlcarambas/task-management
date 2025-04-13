@@ -62,7 +62,7 @@ jobs:
         
       - name: Run tests
         run: |
-          sudo NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
+          sudo NX_SKIP_NX_CACHE=true npx nx run-many --target=test --all --base=${{ steps.affected.outputs.base }} --ci --parallel=3
           docker compose -f docker-compose.yml logs nx-dev
 
       - name: Run build
