@@ -1,8 +1,7 @@
 // import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 import mongoose, { Document, Schema, Types } from 'mongoose';
-import { IUser } from './user'; // Import the user interface
+import { IUser } from './user';
 
-// Interface for Task document
 export interface ITask extends Document {
   title: string;
   description?: string;
@@ -40,7 +39,7 @@ const taskSchema = new Schema<ITask>(
     createdAt: {
       type: Date,
       default: Date.now,
-      immutable: true, // Prevent modification after creation
+      immutable: true,
     },
   },
   {
