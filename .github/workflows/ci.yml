@@ -31,14 +31,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Create and set proper permissions for Nx cache directories
-      - name: Setup Nx cache directories
+      # Run all commands with sudo to bypass permission issues
+      - name: Fix all permissions
         run: |
-          mkdir -p /home/runner/.cache/nx
-          mkdir -p .nx
-          chmod -R 777 /home/runner/.cache/nx
-          chmod -R 777 .nx
-          chmod -R 755 ./node_modules
+          sudo chmod -R 777 .
+          sudo mkdir -p /home/runner/.cache/nx
+          sudo chmod -R 777 /home/runner/.cache/nx
+          sudo find . -type d -exec chmod 777 {} \;
 
       - name: Determine affected projects
         id: affected
@@ -56,17 +55,94 @@ jobs:
           docker compose -f docker-compose.yml up -d
           docker ps -a
 
-      - name: Run lint with NX_SKIP_NX_CACHE
-        run: NX_SKIP_NX_CACHE=true npx nx affected --target=lint --base=${{ steps.affected.outputs.base }} --parallel=3
-
+      # Try running linting separately with a direct approach
+      - name: Run lint
+        run: |
+          sudo NX_SKIP_NX_CACHE=true npx nx run-many --target=lint --all --parallel=3
+        
       - name: Run tests
         run: |
-          NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
+          sudo NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
           docker compose -f docker-compose.yml logs api
 
       - name: Run build
-        run: NX_SKIP_NX_CACHE=true npx nx affected --target=build --base=${{ steps.affected.outputs.base }} --parallel=3
+        run: |
+          sudo NX_SKIP_NX_CACHE=true npx nx affected --target=build --base=${{ steps.affected.outputs.base }} --parallel=3
 
       - name: Cleanup
         if: always()
         run: docker compose -f docker-compose.yml down
+
+
+# name: CI
+
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+
+# env:
+#   NX_CLOUD_DISTRIBUTED_EXECUTION: false
+
+# jobs:
+#   ci:
+#     runs-on: ubuntu-latest
+#     services:
+#       docker:
+#         image: docker:dind
+#         options: --privileged
+        
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: 'npm'
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       # Create and set proper permissions for Nx cache directories
+#       - name: Setup Nx cache directories
+#         run: |
+#           mkdir -p /home/runner/.cache/nx
+#           mkdir -p .nx
+#           chmod -R 777 /home/runner/.cache/nx
+#           chmod -R 777 .nx
+#           chmod -R 755 ./node_modules
+
+#       - name: Determine affected projects
+#         id: affected
+#         uses: nrwl/nx-set-shas@v4
+#         with:
+#           main-branch-name: 'main'
+
+#       - name: Setup Docker
+#         run: |
+#           docker compose version
+#           docker compose -f docker-compose.yml build
+
+#       - name: Start services
+#         run: |
+#           docker compose -f docker-compose.yml up -d
+#           docker ps -a
+
+#       - name: Run lint with NX_SKIP_NX_CACHE
+#         run: NX_SKIP_NX_CACHE=true npx nx affected --target=lint --base=${{ steps.affected.outputs.base }} --parallel=3
+
+#       - name: Run tests
+#         run: |
+#           NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
+#           docker compose -f docker-compose.yml logs api
+
+#       - name: Run build
+#         run: NX_SKIP_NX_CACHE=true npx nx affected --target=build --base=${{ steps.affected.outputs.base }} --parallel=3
+
+#       - name: Cleanup
+#         if: always()
+#         run: docker compose -f docker-compose.yml down
