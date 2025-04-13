@@ -117,8 +117,14 @@ jobs:
           docker compose -f docker-compose.yml up -d
           docker ps -a
 
+      - name: Nx Affected
+        uses: nrwl/nx-set-shas@v3
+        
       - name: Run lint
-        run: npx nx affected --target=lint --base=${{ steps.affected.outputs.base }} --parallel=3
+        run: npx nx affected --target=lint --parallel=3
+
+      # - name: Run lint
+      #   run: npx nx affected --target=lint --base=${{ steps.affected.outputs.base }} --parallel=3
 
       - name: Run tests
         run: |
