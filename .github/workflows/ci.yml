@@ -40,11 +40,11 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker compose -f docker-compose.yml build
+          docker compose -f ../docker-compose.yml build
 
       - name: Run services
         run: |
-          docker compose -f docker-compose.yml up -d
+          docker compose -f ../docker-compose.yml up -d
           docker ps -a
 
       - name: Run linting
@@ -53,11 +53,11 @@ jobs:
       - name: Run tests
         run: |
           npx nx affected --target=test --parallel=3 --ci
-          docker compose -f docker-compose.yml down
+          docker compose -f ../docker-compose.yml down
 
       - name: Run build
         run: npx nx affected --target=build --parallel=3
 
       - name: Cleanup
         if: always()
-        run: docker compose -f docker-compose.yml down
+        run: docker compose -f ../docker-compose.yml down
