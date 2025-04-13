@@ -104,8 +104,8 @@ jobs:
         with:
           main-branch-name: 'main'
 
-      # - name: Fix permissions
-      #   run: sudo chmod -R 777 .
+      - name: Fix permissions
+        run: sudo chmod -R 777 .
 
       - name: Setup Docker
         run: |
@@ -117,14 +117,13 @@ jobs:
           docker compose -f docker-compose.yml up -d
           docker ps -a
 
-      - name: Set permissions
-        run: chmod -R 755 .
-
-      - name: Nx Affected
-        uses: nrwl/nx-set-shas@v3
+      # - name: Nx Affected
+      #   uses: nrwl/nx-set-shas@v3
         
-      - name: Run lint
-        run: npx nx affected --target=lint --parallel=3
+      # - name: Run lint
+      #   run: npx nx affected --target=lint --parallel=3
+      - name: Debug with verbose output
+        run: npx nx affected --target=lint --base=main --parallel=3 --verbose
 
       # - name: Run lint
       #   run: npx nx affected --target=lint --base=${{ steps.affected.outputs.base }} --parallel=3
