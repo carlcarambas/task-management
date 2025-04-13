@@ -15,10 +15,14 @@ const TaskList = ({
 }: TaskListProps) => {
   if (isLoading) {
     return (
-      <div className="py-4">
+      <div className="py-4" data-testid="task-list-loading">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-16 bg-gray-200 rounded"></div>
+            <div
+              key={item}
+              className="h-16 bg-gray-200 rounded"
+              data-testid="task-loader"
+            ></div>
           ))}
         </div>
       </div>
@@ -26,7 +30,7 @@ const TaskList = ({
   }
 
   return (
-    <div className="mt-4">
+    <div className="mt-4" data-testid="task-list">
       <ul className="divide-y divide-gray-200">
         {tasks.map((task) => (
           <li key={task._id} className="py-4">
@@ -44,6 +48,7 @@ const TaskList = ({
                       ? 'line-through text-gray-500'
                       : 'text-gray-900'
                   }`}
+                  data-testid={`task-title-${task._id}`}
                 >
                   {task.name || task.title}
                 </span>
@@ -51,12 +56,16 @@ const TaskList = ({
               <button
                 onClick={() => onDelete?.(task._id)}
                 className="ml-2 px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-md hover:bg-red-200"
+                data-testid={`delete-button-${task._id}`}
               >
                 Delete
               </button>
             </div>
             {task.description && (
-              <p className="mt-1 ml-8 text-sm text-gray-500">
+              <p
+                className="mt-1 ml-8 text-sm text-gray-500"
+                data-testid={`task-description-${task._id}`}
+              >
                 {task.description}
               </p>
             )}
