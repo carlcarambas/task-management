@@ -28,8 +28,10 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     req.token = token;
     req.user = user;
     next();
-  } catch (e) {
-    res.status(401).send({ error: 'Please authenticate.' });
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      res.status(401).send({ error: 'Please authenticate.' });
+    }
   }
 };
 

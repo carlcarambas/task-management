@@ -190,8 +190,12 @@ router.post('/logout', auth, async (req, res) => {
     }
 
     res.send({ message: 'Logged out successfully' });
-  } catch (error) {
-    res.status(500).send({ error: 'Logout failed' });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).send({ error: 'Logout failed' });
+    } else {
+      res.status(500).send({ error: 'An unknown error occurred' });
+    }
   }
 });
 

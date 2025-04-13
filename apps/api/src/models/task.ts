@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema, Model, Types } from 'mongoose';
+// import mongoose, { Document, Schema, Model, Types } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 import { IUser } from './user'; // Import the user interface
 
 // Interface for Task document
@@ -11,9 +12,10 @@ export interface ITask extends Document {
 }
 
 // Task model interface
-interface ITaskModel extends Model<ITask> {}
+// interface ITaskModel extends Model<ITask> {}
 
-const taskSchema = new Schema<ITask, ITaskModel>(
+const taskSchema = new Schema<ITask>(
+  // const taskSchema = new Schema<ITask, ITaskModel>(
   {
     title: {
       type: String,
@@ -57,5 +59,6 @@ taskSchema.index({ createdAt: -1 });
 //   return this.where({ owner: ownerId });
 // };
 
-const Task = mongoose.model<ITask, ITaskModel>('Task', taskSchema);
+const Task = mongoose.model<ITask>('Task', taskSchema);
+// const Task = mongoose.model<ITask, ITaskModel>('Task', taskSchema);
 export default Task;

@@ -102,8 +102,12 @@ router.get('/', auth, async (req, res) => {
   try {
     const tasks = await Task.find({ owner: req.user._id, ...match });
     res.send(tasks);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).send({ error: error.message });
+    } else {
+      res.status(500).send({ error: 'An unknown error occurred' });
+    }
   }
 });
 
@@ -120,7 +124,7 @@ router.get('/', auth, async (req, res) => {
  *         description: The ID of the task to retrieve
  *         schema:
  *           type: string
- *     responses:    
+ *     responses:
  *       200:
  *         description: Successfully retrieved the task
  *         content:
@@ -156,7 +160,7 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-/** 
+/**
  * @swagger
  * /tasks/{id}:
  *   patch:
