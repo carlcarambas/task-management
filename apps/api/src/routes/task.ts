@@ -4,7 +4,50 @@ import auth from '../middleware/auth';
 
 const router: Router = express.Router();
 
-// Create a task
+/**
+ * @swagger
+ * /tasks:
+ *   post:
+ *     summary: Create a new task
+ *     tags: [Tasks]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *               - owner
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: Task title
+ *               description:
+ *                 type: string
+ *                 example: Task description
+ *               completed:
+ *                 type: boolean
+ *                 example: false
+ *               owner:
+ *                 type: string
+ *                 example: "5f6d6a8d8e9d5a0e0a0d0c0b0a090807060504030201000"
+ *     responses:
+ *       201:
+ *         description: Successfully created a new task
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 task:
+ *                   $ref: '#/components/schemas/Task'
+ *       400:
+ *         description: Invalid request body
+ *       500: 
+ *         description: Server error
+ */
 router.post('/', auth, async (req, res) => {
   try {
     const task = new Task({
@@ -23,7 +66,32 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Get all tasks (with optional filtering)
+/**
+ * @swagger
+ * /tasks:
+ *   get:
+ *     summary: Get all tasks
+ *     tags: [Tasks]
+ *     parameters:
+ *       - name: completed
+ *         in: query
+ *         description: Filter tasks by completed status
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all tasks
+ *         content:
+ *           application/json:    
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Task'
+ *       500:
+ *         description: Server error
+ */
 router.get('/', auth, async (req, res) => {
   const match = { completed: false };
 
@@ -39,6 +107,34 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   get:
+ *     summary: Get a specific task
+ *     tags: [Tasks]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the task to retrieve
+ *         schema:
+ *           type: string
+ *     responses:    
+ *       200:
+ *         description: Successfully retrieved the task
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 task:
+ *                   $ref: '#/components/schemas/Task'
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error
+ */
 router.get('/:id', auth, async (req, res) => {
   try {
     const task = await Task.findOne({
@@ -60,6 +156,56 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
+/** 
+ * @swagger
+ * /tasks/{id}:
+ *   patch:
+ *     summary: Update a specific task
+ *     tags: [Tasks]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the task to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *               - completed
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: Task title
+ *               description:
+ *                 type: string
+ *                 example: Task description
+ *               completed:
+ *                 type: boolean
+ *                 example: false
+ *     responses:
+ *       200:
+ *         description: Successfully updated the task
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 task:
+ *                   $ref: '#/components/schemas/Task'
+ *       400:
+ *         description: Invalid request body
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error
+ */
 router.patch('/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['title', 'description', 'completed'];
@@ -94,6 +240,34 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Delete a specific task
+ *     tags: [Tasks]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the task to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the task
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 task:
+ *                   $ref: '#/components/schemas/Task'
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error  
+ */
 router.delete('/:id', auth, async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({

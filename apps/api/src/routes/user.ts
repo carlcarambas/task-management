@@ -10,7 +10,55 @@ interface UpdateUserRequestBody {
   password?: string;
 }
 
-// User signup
+/**
+ * @swagger
+ * /users/signup:
+ *   post:
+ *     summary: Sign up a new user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Babababa Yaga
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: bbbb@mail.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "securePassword123!"
+ *     responses:
+ *       201:
+ *         description: Successfully created a new user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *                   description: JWT access token
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Invalid request body
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -36,7 +84,51 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// User login
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Authenticate a user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "securePassword123!"
+ *     responses:
+ *       200:
+ *         description: Successfully authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT access token
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid request body
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -61,7 +153,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// User logout (current session)
+/**
+ * @swagger
+ * /users/logout:
+ *   post:
+ *     summary: Log out a user
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating that the user has been logged out
+ *                   example: "Logged out successfully"
+ *       500:
+ *         description: Server error  
+ */
 router.post('/logout', auth, async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -83,12 +195,72 @@ router.post('/logout', auth, async (req, res) => {
   }
 });
 
-// Get user profile
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get the current user's profile
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the user's profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Server error  
+ */
 router.get('/me', auth, async (req, res) => {
   res.send(req.user);
 });
 
-// Update user profile
+/**
+ * @swagger
+ * /users/me:
+ *   patch:
+ *     summary: Update the current user's profile
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Babababa Yaga
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: bbbb@mail.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "securePassword123!"
+ *     responses:
+ *       200:
+ *         description: Successfully updated the user's profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid request body
+ *       500:
+ *         description: Server error    
+ */
 router.patch('/me', auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'email', 'password'];
@@ -117,7 +289,25 @@ router.patch('/me', auth, async (req, res) => {
   }
 });
 
-// Delete user account
+/**
+ * @swagger
+ * /users/me:
+ *   delete:
+ *     summary: Delete the current user's account
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the user's account
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Server error  
+ */
 router.delete('/me', auth, async (req, res) => {
   try {
     await req.user.deleteOne();
