@@ -63,7 +63,7 @@ jobs:
       - name: Run tests
         run: |
           sudo NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
-          docker compose -f docker-compose.yml logs api
+          docker compose -f docker-compose.yml logs nx-dev
 
       - name: Run build
         run: |
@@ -138,7 +138,7 @@ jobs:
 #       - name: Run tests
 #         run: |
 #           NX_SKIP_NX_CACHE=true npx nx affected --target=test --base=${{ steps.affected.outputs.base }} --ci --parallel=3
-#           docker compose -f docker-compose.yml logs api
+#           docker compose -f docker-compose.yml logs nx-dev
 
 #       - name: Run build
 #         run: NX_SKIP_NX_CACHE=true npx nx affected --target=build --base=${{ steps.affected.outputs.base }} --parallel=3
