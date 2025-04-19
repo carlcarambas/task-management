@@ -30,3 +30,5 @@ API documentation can be found at http://localhost:3333/api/docs
  
 - You have Node.js and npm installed on your machine.
 - You have Docker and Docker Compose installed on your machine.
+
+.env file is included since variables are does not include any sensitive information.
