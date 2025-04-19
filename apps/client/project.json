@@ -5,7 +5,52 @@
   "projectType": "application",
   "tags": [],
   "// targets": "to see all targets run: nx show project ui --web",
-  "targets": {},
+  "targets": {
+    "build-deploy-ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "echo npm version patch",
+            "description": "Bumps the version in package.json"
+          },
+          {
+            "command": "firebase use tmanagement-v2-041825",
+            "description": "Sets the Firebase project to use"
+          },
+          {
+            "command": "npm run dist:clean",
+            "description": "Cleans the ui project"
+          },
+          {
+            "command": "nx run client:build",
+            "description": "Builds the ui project"
+          },
+          {
+            "command": "firebase deploy --only hosting",
+            "description": "Deploys the Firebase Hosting"
+          }
+        ],
+        "parallel": false
+      }
+    },
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/client"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    }
+  },
   "test": {
     "executor": "@nrwl/jest:jest",
     "options": {

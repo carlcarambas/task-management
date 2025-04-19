@@ -143,6 +143,7 @@ router.post('/login', async (req, res) => {
       sameSite: 'lax',
       secure: false /* true */,
     });
+    // for simplification, we are returning the token as well
     res.send({ user, token });
   } catch (error: unknown) {
     if (error instanceof Error) {

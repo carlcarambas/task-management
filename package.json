@@ -8,7 +8,13 @@
     "build:client": "nx build client",
     "build:api": "nx build api",
     "serve:client": "nx serve client",
-    "serve:api": "nx serve api"
+    "serve:api": "nx serve api",
+    "---------------- Firebase Hosting ----------------": "",
+    "fb:ui:build:deploy:dev": "nx run client:build-deploy-ui",
+    "---------------- Admin Tasks ----------------": "",
+    "nx:reset": "nx reset",
+    "killports": "kill-port 8081 8085 4000 3000",
+    "dist:clean": "rm -rf dist/apps"
   },
   "private": true,
   "devDependencies": {
@@ -43,6 +49,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
+    "@types/socket.io": "^3.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@vitejs/plugin-react": "^4.2.0",
@@ -84,12 +91,14 @@
     "apps/api/*"
   ],
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "axios": "^1.6.0",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "http": "^0.0.1-security",
     "http-error": "^0.0.6",
     "immer": "^10.1.1",
     "js-cookie": "^3.0.5",
@@ -98,6 +107,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "^7.5.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "unless": "^0.1.1",

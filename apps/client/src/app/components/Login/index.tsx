@@ -36,7 +36,10 @@ export function Login() {
       console.log('Logging in with:', formData.email, formData.password);
       const { name, ...signInData } = formData;
       const signInResponse = await api.post('/users/login', signInData);
-      setUser(signInResponse.data.user);
+      setUser({
+        ...signInResponse.data.user,
+        token: signInResponse.data.token,
+      });
       navigate('/tasks');
     } else {
       console.log(
@@ -48,6 +51,7 @@ export function Login() {
       // signup logic
       const signUpResponse = await api.post('/users/signup', formData);
       console.log(signUpResponse);
+      setIsLogin(true);
     }
     setIsLoading(false);
   };

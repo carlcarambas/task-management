@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import Task from '../models/task';
 import auth from '../middleware/auth';
+import { getWebSocketService } from '../websocket/websocket.adapter';
 
 const router: Router = express.Router();
 
@@ -45,17 +46,22 @@ const router: Router = express.Router();
  *                   $ref: '#/components/schemas/Task'
  *       400:
  *         description: Invalid request body
- *       500: 
+ *       500:
  *         description: Server error
  */
 router.post('/', auth, async (req, res) => {
   try {
+    const wsService = getWebSocketService();
     const task = new Task({
       ...req.body,
       owner: req.user._id,
     });
 
     await task.save();
+    wsService.sendToUser(req.user._id.toString(), 'notification', {
+      message: `Added New Task: ${req.body.title}`,
+      timestamp: new Date(),
+    });
     res.status(201).send(task);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -84,7 +90,7 @@ router.post('/', auth, async (req, res) => {
  *       200:
  *         description: Successfully retrieved all tasks
  *         content:
- *           application/json:    
+ *           application/json:
  *             schema:
  *               type: array
  *               items:
@@ -100,7 +106,8 @@ router.get('/', auth, async (req, res) => {
   }
 
   try {
-    const tasks = await Task.find({ owner: req.user._id, ...match });
+    const tasks = await Task.find({ owner: req.user._id });
+    // const tasks = await Task.find({ owner: req.user._id, ...match });
     res.send(tasks);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -211,6 +218,7 @@ router.get('/:id', auth, async (req, res) => {
  *         description: Server error
  */
 router.patch('/:id', auth, async (req, res) => {
+  const wsService = getWebSocketService();
   const updates = Object.keys(req.body);
   const allowedUpdates = ['title', 'description', 'completed'];
   const isValidOperation = updates.every((update) =>
@@ -233,6 +241,11 @@ router.patch('/:id', auth, async (req, res) => {
 
     updates.forEach((update) => (task[update] = req.body[update]));
     await task.save();
+
+    wsService.sendToUser(req.user._id.toString(), 'notification', {
+      message: `Updated Task: ${updates.join(', ')}`,
+      timestamp: new Date(),
+    });
 
     res.send(task);
   } catch (error: unknown) {
@@ -270,7 +283,7 @@ router.patch('/:id', auth, async (req, res) => {
  *       404:
  *         description: Task not found
  *       500:
- *         description: Server error  
+ *         description: Server error
  */
 router.delete('/:id', auth, async (req, res) => {
   try {
@@ -282,6 +295,12 @@ router.delete('/:id', auth, async (req, res) => {
     if (!task) {
       return res.status(404).send({ error: 'Task not found' });
     }
+
+    const wsService = getWebSocketService();
+    wsService.sendToUser(req.user._id.toString(), 'notification', {
+      message: `Deleted Task: ${task.title}`,
+      timestamp: new Date(),
+    });
 
     res.send(task);
   } catch (error: unknown) {

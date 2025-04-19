@@ -10,6 +10,12 @@ import swaggerUi from 'swagger-ui-express';
 import http from 'http';
 import createHttpError from 'http-errors';
 
+// import {Server} from 'socket.io'
+
+import {
+  getWebSocketService,
+  initializeWebSocket,
+} from './websocket/websocket.adapter';
 // Load environment variables
 dotenv.config();
 
@@ -18,6 +24,11 @@ connectDB();
 
 // Initialize Express app
 const app = express();
+
+const server = http.createServer(app);
+
+// Initialize WebSocket
+initializeWebSocket(server);
 
 const swaggerOptions = {
   definition: {
@@ -146,6 +157,28 @@ app.get('/api/swagger.json', (_req, res) => {
 apiRouter.use('/users', userRouter);
 apiRouter.use('/tasks', taskRouter);
 
+// Example protected route
+app.post('/notify', (req, res) => {
+  const { userId, message } = req.body;
+  const wsService = getWebSocketService();
+
+  if (userId) {
+    console.log('WsService');
+    wsService.sendToUser(userId, 'notification', {
+      message,
+      timestamp: new Date(),
+    });
+  } else {
+    console.log('WsService 2');
+    wsService.broadcast('notification', {
+      message,
+      timestamp: new Date(),
+    });
+  }
+
+  res.json({ success: true });
+});
+
 app.use('/api', apiRouter);
 
 // handle errors
@@ -171,7 +204,8 @@ app.use((err: any, req: Request, res: Response) => {
 });
 
 const PORT = process.env.PORT || 3333;
-const server = app.listen(PORT, () => {
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
